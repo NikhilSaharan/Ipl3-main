@@ -80,7 +80,7 @@ export const INITIAL_TEAMS = [
       { name: "Sameer Rizvi", role: "Batsman" },
       { name: "Naman Dhir", role: "Batsman" },
       { name: "Shivam Dube", role: "Allrounder" },
-      { name: "Krunal Pandya", role: "Allrounder" }
+      { name: "Josh Hazlewood", role: "Bowler" }
     ]
   }
 ];
