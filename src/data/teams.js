@@ -73,7 +73,7 @@ export const INITIAL_TEAMS = [
       { name: "Rishabh Pant", role: "Wicketkeeper" },
       { name: "Abhishek Sharma", role: "Allrounder" },
       { name: "Sai Sudharsan", role: "Batsman", isVC: true },
-      { name: "Vaibhav Suryavanshi", role: "Batsman", isCaptain: true },
+      { name: "Vaibhav Sooryavanshi", role: "Batsman", isCaptain: true },
       { name: "Quinton de Kock", role: "Wicketkeeper" },
       { name: "Cameron Green", role: "Allrounder" },
       { name: "Prabhsimran Singh", role: "Wicketkeeper" },

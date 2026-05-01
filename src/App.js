@@ -7,16 +7,54 @@ import { calculatePoints } from './utils/scoring';
 import { RefreshCw, Zap, Trophy, CheckCircle2, Star, Shield } from 'lucide-react';
 
 
-const CRIC_API_KEY = "f222370e-2beb-4af8-9941-c435b5310964";
+const CRIC_API_KEYS = [
+  "7aee67b5-00b1-4a90-a1ad-d1caabacab84",
+  "86f764f5-5f77-44ce-80de-4b73ef9c4f15",
+  "d25b3355-c78e-432b-863e-fc324f558f29",
+  "f222370e-2beb-4af8-9941-c435b5310964",
+  "538d0d08-0175-4e24-b9d5-d72af0e83d23",
+  "a5bf3381-0a32-4862-acf4-5f52212682af",
+  "faad77ac-7dbc-4dc1-b180-8db6bbfb5df8"
+];
 const IPL_SERIES_ID = "87c62aac-bc3c-4738-ab93-19da0690488f";
+
+const fetchFromCricAPI = async (urlBuilder) => {
+  let startIndex = parseInt(localStorage.getItem('cricapi_key_index') || "0");
+  let attempts = 0;
+
+  while (attempts < CRIC_API_KEYS.length) {
+    let currentIndex = (startIndex + attempts) % CRIC_API_KEYS.length;
+    let apiKey = CRIC_API_KEYS[currentIndex];
+    let url = urlBuilder(apiKey);
+
+    try {
+      const res = await axios.get(url);
+      const apiData = res.data;
+
+      if (apiData && apiData.status === "success") {
+        // Save working key index
+        localStorage.setItem('cricapi_key_index', currentIndex.toString());
+        return apiData;
+      }
+
+      console.warn(`Key ${apiKey} failed (status: ${apiData?.status || 'unknown'}). Trying next...`);
+      attempts++;
+    } catch (err) {
+      console.warn(`Key ${apiKey} failed with error. Trying next...`);
+      attempts++;
+    }
+  }
+
+  return null; // All keys exhausted
+};
 
 const NAME_MAP = {
   "Sheheferd": "Romario Shepherd",
-"Rizvi": "Sameer Rizvi",
-"Jurel": "Dhruv Jurel",
-"Vaibhav arorra": "Vaibhav Arora",
-"Nitinsh Rana": "Nitish Rana",
-"Surya": "Suryakumar Yadav",
+  "Rizvi": "Sameer Rizvi",
+  "Jurel": "Dhruv Jurel",
+  "Vaibhav arorra": "Vaibhav Arora",
+  "Nitinsh Rana": "Nitish Rana",
+  "Surya": "Suryakumar Yadav",
   "Phil Salt": "Philip Salt",
   "Phill Salt": "Philip Salt",
   "PS Salt": "Philip Salt",
@@ -172,15 +210,13 @@ function App() {
     setSyncStatus("Fetching Matches...");
 
     try {
-      const res = await axios.get(
-        `https://api.cricapi.com/v1/series_info?apikey=${CRIC_API_KEY}&id=${IPL_SERIES_ID}`
+      const apiData = await fetchFromCricAPI((key) =>
+        `https://api.cricapi.com/v1/series_info?apikey=${key}&id=${IPL_SERIES_ID}`
       );
 
-      const apiData = res.data;
-
-      if (!apiData || apiData.status !== "success" || !apiData.data) {
-        console.error("❌ API FAIL:", apiData);
-        alert("API se data nahi aaya (limit / error)");
+      if (!apiData || !apiData.data) {
+        console.error("❌ API FAIL: All keys exhausted or failed");
+        alert("API se data nahi aaya (Sabhi keys ki limit khtm ho gayi hai ya error hai)");
         return;
       }
 
@@ -223,11 +259,11 @@ function App() {
       setLoading(true);
       setSyncStatus(`Syncing ${match.name}`);
 
-      const res = await axios.get(
-        `https://api.cricapi.com/v1/match_scorecard?apikey=${CRIC_API_KEY}&id=${match.id}`
+      const apiData = await fetchFromCricAPI((key) =>
+        `https://api.cricapi.com/v1/match_scorecard?apikey=${key}&id=${match.id}`
       );
 
-      const scorecardData = res.data?.data;
+      const scorecardData = apiData?.data;
 
       if (!scorecardData || !scorecardData.scorecard) {
         setErrorMatches(prev => [...prev, match.id]);
