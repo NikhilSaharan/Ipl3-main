@@ -7,52 +7,45 @@ import { calculatePoints } from './utils/scoring';
 import { RefreshCw, Zap, Trophy, CheckCircle2, Star, Shield } from 'lucide-react';
 
 
-const RAPID_API_KEYS = [
-  "771a33ee3cmsh1a4213e76ee6caep1fa8d5jsn0f11c5431396",
-  "cb9682b781mshdee42b0a24e7a73p16f641jsnee74b56ee34d",
-  "3c1e110b5dmsh18f103eaef293a2p15297ajsnc1841ae109e2"
+const CRIC_API_KEYS = [
+  "7aee67b5-00b1-4a90-a1ad-d1caabacab84",
+  "86f764f5-5f77-44ce-80de-4b73ef9c4f15",
+  "d25b3355-c78e-432b-863e-fc324f558f29",
+  "f222370e-2beb-4af8-9941-c435b5310964",
+  "538d0d08-0175-4e24-b9d5-d72af0e83d23",
+  "a5bf3381-0a32-4862-acf4-5f52212682af",
+  "faad77ac-7dbc-4dc1-b180-8db6bbfb5df8"
 ];
-const RAPID_API_HOST = "cricbuzz-cricket.p.rapidapi.com";
-const IPL_SERIES_ID = "9241"; // IPL 2026
+const IPL_SERIES_ID = "87c62aac-bc3c-4738-ab93-19da0690488f";
 
-const fetchFromRapidAPI = async (endpoint) => {
-  let startIndex = parseInt(localStorage.getItem('rapidapi_key_index') || "0");
+const fetchFromCricAPI = async (urlBuilder) => {
+  let startIndex = parseInt(localStorage.getItem('cricapi_key_index') || "0");
   let attempts = 0;
 
-  while (attempts < RAPID_API_KEYS.length) {
-    let currentIndex = (startIndex + attempts) % RAPID_API_KEYS.length;
-    let apiKey = RAPID_API_KEYS[currentIndex];
+  while (attempts < CRIC_API_KEYS.length) {
+    let currentIndex = (startIndex + attempts) % CRIC_API_KEYS.length;
+    let apiKey = CRIC_API_KEYS[currentIndex];
+    let url = urlBuilder(apiKey);
 
     try {
-      const res = await axios.get(`https://${RAPID_API_HOST}${endpoint}`, {
-        headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': RAPID_API_HOST
-        }
-      });
+      const res = await axios.get(url);
+      const apiData = res.data;
 
-      // Sometimes RapidAPI returns 200 OK but with an error message in body if limit exceeded or not subscribed
-      if (res.data && res.data.message) {
-        const msg = res.data.message.toLowerCase();
-        if (msg.includes("not subscribed") || msg.includes("exceeded")) {
-          console.warn(`Key ${apiKey} limit exceeded or not subscribed. Trying next...`);
-          attempts++;
-          continue;
-        }
+      if (apiData && apiData.status === "success") {
+        // Save working key index
+        localStorage.setItem('cricapi_key_index', currentIndex.toString());
+        return apiData;
       }
 
-      // Success! Save the working key index.
-      localStorage.setItem('rapidapi_key_index', currentIndex.toString());
-      return res.data;
-
+      console.warn(`Key ${apiKey} failed (status: ${apiData?.status || 'unknown'}). Trying next...`);
+      attempts++;
     } catch (err) {
-      // Axios throws error for 4xx/5xx status codes (e.g., 429 Too Many Requests, 403 Forbidden)
-      console.warn(`Key ${apiKey} failed with error (Status: ${err.response?.status || 'unknown'}). Trying next...`);
+      console.warn(`Key ${apiKey} failed with error. Trying next...`);
       attempts++;
     }
   }
 
-  return null; // All keys exhausted or failed
+  return null; // All keys exhausted
 };
 
 const NAME_MAP = {
@@ -152,63 +145,6 @@ function App() {
     };
 
     scorecard.forEach(inning => {
-      // --- CRICBUZZ RAPIDAPI FORMAT ---
-      if (inning.batsman) {
-        inning.batsman.forEach(b => {
-          const batsmanName = ensure(b.name);
-          if (!batsmanName) return;
-
-          statsMap[batsmanName].runs = (statsMap[batsmanName].runs || 0) + (b.runs || 0);
-          statsMap[batsmanName].balls = (statsMap[batsmanName].balls || 0) + (b.balls || 0);
-          statsMap[batsmanName].fours = (statsMap[batsmanName].fours || 0) + (b.fours || 0);
-          statsMap[batsmanName].sixes = (statsMap[batsmanName].sixes || 0) + (b.sixes || 0);
-
-          if (b.runs === 0 && b.outdec && b.outdec.toLowerCase() !== "not out" && b.outdec !== "") {
-            statsMap[batsmanName].isDuck = true;
-          }
-
-          const rawOutDesc = b.outdec || '';
-          const outDescLower = rawOutDesc.toLowerCase();
-
-          if (outDescLower.includes(' b ') || outDescLower.match(/^b\s+/)) {
-            if (outDescLower.startsWith('c ') && !outDescLower.startsWith('c & b')) {
-              const match = rawOutDesc.match(/^c\s+(.+?)\s+b\s+/i);
-              if (match && match[1]) {
-                const catcher = match[1].replace(/^\(sub\)\s+/i, '');
-                addCatch(catcher);
-              }
-            } else if (outDescLower.startsWith('st ')) {
-              const match = rawOutDesc.match(/^st\s+(.+?)\s+b\s+/i);
-              if (match && match[1]) addStumping(match[1]);
-            } else if (outDescLower.startsWith('c & b ')) {
-              const match = rawOutDesc.match(/^c\s*&\s*b\s+(.+)/i);
-              if (match && match[1]) addCatch(match[1]);
-            }
-
-            if (outDescLower.includes('lbw b ') || outDescLower.match(/^b\s+/)) {
-              const bowlerMatch = rawOutDesc.match(/(?:lbw\s+)?b\s+(.+)$/i);
-              if (bowlerMatch && bowlerMatch[1]) {
-                const bowlerName = ensure(bowlerMatch[1]);
-                if (bowlerName) {
-                  statsMap[bowlerName].lbw_or_bowled = (statsMap[bowlerName].lbw_or_bowled || 0) + 1;
-                }
-              }
-            }
-          }
-        });
-      }
-
-      if (inning.bowler) {
-        inning.bowler.forEach(bw => {
-          const name = ensure(bw.name);
-          if (!name) return;
-          statsMap[name].wickets = (statsMap[name].wickets || 0) + (bw.wickets || 0);
-          statsMap[name].overs = (statsMap[name].overs || 0) + (bw.overs || 0);
-          statsMap[name].runs_conceded = (statsMap[name].runs_conceded || 0) + (bw.runs || 0);
-        });
-      }
-
-      // --- CRICAPI FORMAT FALLBACK ---
       if (inning.batting) {
         inning.batting.forEach(b => {
           const batsmanName = ensure(b.batsman?.name);
@@ -274,41 +210,17 @@ function App() {
     setSyncStatus("Fetching Matches...");
 
     try {
-      const apiData = await fetchFromRapidAPI(`/series/v1/${IPL_SERIES_ID}`);
+      const apiData = await fetchFromCricAPI((key) =>
+        `https://api.cricapi.com/v1/series_info?apikey=${key}&id=${IPL_SERIES_ID}`
+      );
 
-      if (!apiData || (!apiData.matchDetails && !apiData.data)) {
-        console.error("❌ API FAIL: RapidAPI data failed");
-        alert("API se data nahi aaya (Limit khtm ho gayi hai ya error hai)");
+      if (!apiData || !apiData.data) {
+        console.error("❌ API FAIL: All keys exhausted or failed");
+        alert("API se data nahi aaya (Sabhi keys ki limit khtm ho gayi hai ya error hai)");
         return;
       }
 
-      let allMatches = [];
-
-      // Parse Cricbuzz RapidAPI format
-      if (apiData.matchDetails) {
-        apiData.matchDetails.forEach(md => {
-          if (md.matchDetailsMap && md.matchDetailsMap.match) {
-            md.matchDetailsMap.match.forEach(m => {
-              if (m.matchInfo) {
-                allMatches.push({
-                  id: m.matchInfo.matchId,
-                  name: m.matchInfo.matchDesc,
-                  teams: [
-                    m.matchInfo.team1?.teamSName || m.matchInfo.team1?.teamName || "Team 1",
-                    m.matchInfo.team2?.teamSName || m.matchInfo.team2?.teamName || "Team 2"
-                  ],
-                  matchEnded: m.matchInfo.state && (m.matchInfo.state.toLowerCase() === 'complete' || m.matchInfo.state.toLowerCase() === 'results')
-                });
-              }
-            });
-          }
-        });
-      }
-      // Fallback if the user actually meant CricAPI format on RapidAPI
-      else if (apiData.data && apiData.data.matchList) {
-        allMatches = apiData.data.matchList;
-      }
-
+      const allMatches = apiData.data.matchList || [];
       const alreadySynced = teams[0].syncedMatches || [];
       const failedMatches = errorMatches || [];
 
@@ -347,74 +259,50 @@ function App() {
       setLoading(true);
       setSyncStatus(`Syncing ${match.name}`);
 
-      const apiData = await fetchFromRapidAPI(`/mcenter/v1/${match.id}/hscard`);
+      const apiData = await fetchFromCricAPI((key) =>
+        `https://api.cricapi.com/v1/match_scorecard?apikey=${key}&id=${match.id}`
+      );
 
-      // Determine scorecard data source based on API type
-      let scorecardData = null;
-      if (apiData && apiData.scorecard) {
-        scorecardData = apiData.scorecard; // Cricbuzz format
-      } else if (apiData && apiData.data && apiData.data.scorecard) {
-        scorecardData = apiData.data.scorecard; // CricAPI fallback format
-      }
+      const scorecardData = apiData?.data;
 
-      if (!scorecardData) {
+      if (!scorecardData || !scorecardData.scorecard) {
         setErrorMatches(prev => [...prev, match.id]);
         return;
       }
 
-      const statsMap = buildPlayerStatsMap(scorecardData);
+      const statsMap = buildPlayerStatsMap(scorecardData.scorecard);
 
       // Build set of players who actually played in this match
+      // This is match-level filtering — only players in statsMap played
+      // For team filtering, build a set per IPL team
       const teamAFull = match.teams[0].toLowerCase();
       const teamBFull = match.teams[1].toLowerCase();
 
+      // Map each player in statsMap to their IPL team
+      // by checking which innings they appeared in
       const playerToIPLTeam = {};
 
-      scorecardData.forEach(inning => {
-        // --- CRICBUZZ ---
-        if (inning.batsman && inning.batteamsname) {
-          const battingTeam = inning.batteamsname.toLowerCase();
-          
-          let bowlingTeam = "";
-          if (teamAFull.includes(battingTeam) || battingTeam.includes(teamAFull)) {
-            bowlingTeam = teamBFull;
-          } else {
-            bowlingTeam = teamAFull;
-          }
+      scorecardData.scorecard.forEach(inning => {
+        const inningTeam = inning.inning.toLowerCase();
+        // This inning's batting team
+        const isTeamA = inningTeam.includes(teamAFull);
+        const isTeamB = inningTeam.includes(teamBFull);
 
-          inning.batsman.forEach(b => {
-            const name = normalizeName(b.name);
-            if (name) playerToIPLTeam[name] = battingTeam;
-          });
-          
-          if (inning.bowler) {
-            inning.bowler.forEach(bw => {
-              const name = normalizeName(bw.name);
-              if (name) playerToIPLTeam[name] = bowlingTeam;
-            });
-          }
-        }
+        // Batsmen belong to the batting team of this inning
+        inning.batting?.forEach(b => {
+          const name = normalizeName(b.batsman?.name);
+          if (!name) return;
+          if (isTeamA) playerToIPLTeam[name] = teamAFull;
+          else if (isTeamB) playerToIPLTeam[name] = teamBFull;
+        });
 
-        // --- CRICAPI FALLBACK ---
-        const inningTeam = (inning.inning || "").toLowerCase();
-        if (inningTeam) {
-          const isTeamA = inningTeam.includes(teamAFull);
-          const isTeamB = inningTeam.includes(teamBFull);
-
-          inning.batting?.forEach(b => {
-            const name = normalizeName(b.batsman?.name);
-            if (!name) return;
-            if (isTeamA) playerToIPLTeam[name] = teamAFull;
-            else if (isTeamB) playerToIPLTeam[name] = teamBFull;
-          });
-
-          inning.bowling?.forEach(bw => {
-            const name = normalizeName(bw.bowler?.name);
-            if (!name) return;
-            if (isTeamA) playerToIPLTeam[name] = teamBFull;
-            else if (isTeamB) playerToIPLTeam[name] = teamAFull;
-          });
-        }
+        // Bowlers belong to the OPPOSITE team of this inning's batting team
+        inning.bowling?.forEach(bw => {
+          const name = normalizeName(bw.bowler?.name);
+          if (!name) return;
+          if (isTeamA) playerToIPLTeam[name] = teamBFull; // bowling against teamA = teamB
+          else if (isTeamB) playerToIPLTeam[name] = teamAFull; // bowling against teamB = teamA
+        });
       });
 
       const updated = teams.map(team => {
