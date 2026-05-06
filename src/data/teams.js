@@ -28,7 +28,7 @@ export const INITIAL_TEAMS = [
       { name: "Nitish Rana", role: "Batsman" },
       { name: "Will Jacks", role: "Allrounder" },
       { name: "Dhruv Jurel", role: "Wicketkeeper" },
-      { name: "Ishan Kishan", role: "Wicketkeeper", isCaptain: true },
+      { name: "Abhishek Sharma", role: "Allrounder", isCaptain: true },
       { name: "Cameron Green", role: "Allrounder" }
     ]
   },
@@ -60,7 +60,7 @@ export const INITIAL_TEAMS = [
       { name: "Sanju Samson", role: "Wicketkeeper", isVC: true },
       { name: "Heinrich Klaasen", role: "Wicketkeeper" },
       { name: "Aiden Markram", role: "Allrounder" },
-      { name: "Abhishek Sharma", role: "Allrounder" },
+      { name: "Ishan Kishan", role: "Wicketkeeper" },
       { name: "Cooper Connolly", role: "Allrounder" },
       { name: "Nitish Kumar Reddy", role: "Allrounder" },
       { name: "Ryan Rickelton", role: "Wicketkeeper" }
