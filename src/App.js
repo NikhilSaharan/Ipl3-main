@@ -328,7 +328,7 @@ function App() {
 
           return getMatchNo(a.name) - getMatchNo(b.name);
         })
-        .slice(37);
+        .slice(48);
 
       setAvailableMatches(pending);
 
