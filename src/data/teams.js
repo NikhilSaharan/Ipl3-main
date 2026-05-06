@@ -1,69 +1,18 @@
 export const INITIAL_TEAMS = [
   {
-    owner: "Abhishek",
-    players: [
-      { name: "Virat Kohli", role: "Batsman", isCaptain: true },
-      { name: "Ruturaj Gaikwad", role: "Batsman", isVC: true },
-      { name: "Devdutt Padikkal", role: "Batsman" },
-      { name: "Ajinkya Rahane", role: "Batsman" },
-      { name: "Pathum Nissanka", role: "Batsman" },
-      { name: "Nicholas Pooran", role: "Wicketkeeper" },
-      { name: "Axar Patel", role: "Allrounder" },
-      { name: "Hardik Pandya", role: "Allrounder" },
-      { name: "Jacob Bethell", role: "Allrounder" },
-      { name: "Nitish Rana", role: "Batsman" },
-      { name: "Sunil Narine", role: "Allrounder" }
-    ]
-  },
-
-  {
     owner: "Himanshu",
     players: [
-      { name: "Prince Yadav", role: "Bowler" },
       { name: "Suryakumar Yadav", role: "Batsman" },
-      { name: "Yashasvi Jaiswal", role: "Batsman", isCaptain: true },
-      { name: "Dewald Brevis", role: "Batsman" },
+      { name: "Sai Sudharsan", role: "Batsman", isCaptain: true },
       { name: "Angkrish Raghuvanshi", role: "Batsman" },
-      { name: "Sanju Samson", role: "Wicketkeeper" },
-      { name: "Jos Buttler", role: "Wicketkeeper", isVC: true },
+      { name: "Ruturaj Gaikwad", role: "Batsman",isVC: true },
+      { name: "Devdutt Padikkal", role: "Batsman" },
+      { name: "Jos Buttler", role: "Wicketkeeper" },
+      { name: "Jacob Bethell", role: "Allrounder" },
       { name: "Mitchell Marsh", role: "Allrounder" },
-      { name: "Cooper Connolly", role: "Allrounder" },
-      { name: "Riyan Parag", role: "Allrounder" },
-      { name: "Priyansh Arya", role: "Batsman" }
-    ]
-  },
-
-  {
-    owner: "Nikhil",
-    players: [
-      { name: "Shreyas Iyer", role: "Batsman", isCaptain: true },
-      { name: "KL Rahul", role: "Wicketkeeper", isVC: true },
-      { name: "Rajat Patidar", role: "Batsman" },
-      { name: "Tilak Varma", role: "Batsman" },
-      { name: "Heinrich Klaasen", role: "Wicketkeeper" },
-      { name: "Dhruv Jurel", role: "Wicketkeeper" },
-      { name: "Tim Seifert", role: "Wicketkeeper" },
-      { name: "Nitish Kumar Reddy", role: "Allrounder" },
-      { name: "Tristan Stubbs", role: "Wicketkeeper" },
-      { name: "Ayush Badoni", role: "Allrounder" },
-      { name: "Rovman Powell", role: "Batsman" }
-    ]
-  },
-
-  {
-    owner: "Jatin",
-    players: [
-      { name: "Shubman Gill", role: "Batsman", isCaptain: true },
-      { name: "Travis Head", role: "Batsman" },
-      { name: "Ishan Kishan", role: "Wicketkeeper", isVC: true },
-      { name: "Aiden Markram", role: "Batsman" },
-      { name: "Washington Sundar", role: "Allrounder" },
-      { name: "Salil Arora", role: "Wicketkeeper" },
-      { name: "Nehal Wadhera", role: "Batsman" },
-      { name: "Eshan Malinga", role: "Bowler" },
+      { name: "Bhuvneshwar Kumar", role: "Bowler" },
       { name: "Anshul Kamboj", role: "Bowler" },
-      { name: "Jamie Overton", role: "Allrounder" },
-      { name: "Arshdeep Singh", role: "Bowler" }
+      { name: "Mohsin Khan", role: "Bowler" }
     ]
   },
 
@@ -71,17 +20,67 @@ export const INITIAL_TEAMS = [
     owner: "Manish",
     players: [
       { name: "Rishabh Pant", role: "Wicketkeeper" },
-      { name: "Abhishek Sharma", role: "Allrounder" },
-      { name: "Sai Sudharsan", role: "Batsman", isVC: true },
-      { name: "Vaibhav Sooryavanshi", role: "Batsman", isCaptain: true },
-      { name: "Quinton de Kock", role: "Wicketkeeper" },
-      { name: "Cameron Green", role: "Allrounder" },
-      { name: "Prabhsimran Singh", role: "Wicketkeeper" },
-      { name: "Sameer Rizvi", role: "Batsman" },
+      { name: "Shreyas Iyer", role: "Batsman", isVC: true },
+      { name: "Dewald Brevis", role: "Batsman" },
+      { name: "Rajat Patidar", role: "Batsman" },
+      { name: "Finn Allen", role: "Wicketkeeper" },
+      { name: "Yashasvi Jaiswal", role: "Batsman" },
+      { name: "Nitish Rana", role: "Batsman" },
+      { name: "Will Jacks", role: "Allrounder" },
+      { name: "Dhruv Jurel", role: "Wicketkeeper" },
+      { name: "Ishan Kishan", role: "Wicketkeeper", isCaptain: true },
+      { name: "Cameron Green", role: "Allrounder" }
+    ]
+  },
+
+  {
+    owner: "Abhishek",
+    players: [
+      { name: "Hardik Pandya", role: "Allrounder" },
+      { name: "Shubman Gill", role: "Batsman", isCaptain: true },
       { name: "Naman Dhir", role: "Batsman" },
-      { name: "Shivam Dube", role: "Allrounder" },
-      { name: "Josh Hazlewood", role: "Bowler" }
+      { name: "Prabhsimran Singh", role: "Wicketkeeper", isVC: true },
+      { name: "Travis Head", role: "Batsman" },
+      { name: "Axar Patel", role: "Allrounder" },
+      { name: "Nicholas Pooran", role: "Wicketkeeper" },
+      { name: "Pathum Nissanka", role: "Batsman" },
+      { name: "Jason Holder", role: "Allrounder" },
+      { name: "Riyan Parag", role: "Allrounder" },
+      { name: "Rinku Singh", role: "Batsman" }
+    ]
+  },
+
+  {
+    owner: "Nikhil",
+    players: [
+      { name: "KL Rahul", role: "Wicketkeeper", isCaptain: true },
+      { name: "Ayush Badoni", role: "Allrounder" },
+      { name: "Sameer Rizvi", role: "Batsman" },
+      { name: "Priyansh Arya", role: "Batsman" },
+      { name: "Sanju Samson", role: "Wicketkeeper", isVC: true },
+      { name: "Heinrich Klaasen", role: "Wicketkeeper" },
+      { name: "Aiden Markram", role: "Allrounder" },
+      { name: "Abhishek Sharma", role: "Allrounder" },
+      { name: "Cooper Connolly", role: "Allrounder" },
+      { name: "Nitish Kumar Reddy", role: "Allrounder" },
+      { name: "Ryan Rickelton", role: "Wicketkeeper" }
+    ]
+  },
+
+  {
+    owner: "Jatin",
+    players: [
+      { name: "Virat Kohli", role: "Batsman", isCaptain: true },
+      { name: "Vaibhav Sooryavanshi", role: "Batsman", isVC: true },
+      { name: "Kagiso Rabada", role: "Bowler" },
+      { name: "Varun Chakravarthy", role: "Bowler" },
+      { name: "Tilak Varma", role: "Batsman" },
+      { name: "Ajinkya Rahane", role: "Batsman" },
+      { name: "Donovan Ferreira", role: "Wicketkeeper" },
+      { name: "Eshan Malinga", role: "Bowler" },
+      { name: "Karthik Sharma", role: "Wicketkeeper" },
+      { name: "Urvil Patel", role: "Wicketkeeper" },
+      { name: "Ghazanfar", role: "Bowler" }
     ]
   }
 ];
-
